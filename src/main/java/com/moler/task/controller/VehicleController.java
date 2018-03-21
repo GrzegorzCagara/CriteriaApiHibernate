@@ -1,5 +1,6 @@
 package com.moler.task.controller;
 
+import com.moler.task.dto.VehicleParameter;
 import com.moler.task.dto.VehicleQueryParameter;
 import com.moler.task.dto.VehicleResponse;
 import com.moler.task.entity.Vehicle;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/vehicles")
@@ -21,14 +23,21 @@ public class VehicleController {
 
 
     @PostMapping("/save")
-    public ResponseEntity<Long> save(@RequestBody Vehicle vehicle){
+    public ResponseEntity<Long> save(@RequestBody VehicleParameter vehicle){
         vehicleService.save(vehicle);
         return new ResponseEntity<>(vehicle.getId(), HttpStatus.CREATED);
     }
 
+//    @PostMapping("/get")
+//    public ResponseEntity<List<VehicleResponse>> getAll(@RequestBody VehicleQueryParameter parameter){
+//        List<VehicleResponse> vehicles = vehicleService.getAllVehicles(parameter);
+//        return new ResponseEntity<>(vehicles, HttpStatus.OK);
+//    }
+
     @PostMapping("/get")
-    public ResponseEntity<List<VehicleResponse>> getAll(@RequestBody VehicleQueryParameter parameter){
-        List<VehicleResponse> vehicles = vehicleService.getAllVehicles(parameter);
+    public ResponseEntity<List<VehicleResponse>> getAll(@RequestParam("offset") Optional<Integer> offset, @RequestParam("text") Optional<String> text,
+                                                        @RequestParam("points") Optional<List<Integer>> points){
+        List<VehicleResponse> vehicles = vehicleService.getAllVehicles(offset, text, points);
         return new ResponseEntity<>(vehicles, HttpStatus.OK);
     }
 

@@ -1,5 +1,6 @@
 package com.moler.task.service;
 
+import com.moler.task.dto.VehicleParameter;
 import com.moler.task.dto.VehicleQueryParameter;
 import com.moler.task.dto.VehicleResponse;
 import com.moler.task.entity.Point;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -43,7 +45,15 @@ public class VehicleServiceImpl implements VehicleService{
     }
 
     @Override
-    public void save(Vehicle vehicle) {
+    public void save(VehicleParameter vehicle) {
         vehicleRepository.save(vehicle);
+    }
+
+    @Override
+    public List<VehicleResponse> getAllVehicles(Optional<Integer> offset, Optional<String> text, Optional<List<Integer>> points) {
+        List<Vehicle> vehicles = vehicleRepository.getAllVehicles(offset, text, points);
+        List<VehicleResponse> vehicleResponses = new LinkedList<>();
+        vehicles.forEach(vehicle -> vehicleResponses.add(new VehicleResponse(200, vehicle)));
+        return vehicleResponses;
     }
 }
