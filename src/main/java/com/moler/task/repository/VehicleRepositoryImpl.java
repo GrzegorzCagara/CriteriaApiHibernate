@@ -2,6 +2,7 @@ package com.moler.task.repository;
 
 import com.moler.task.dto.VehicleQueryParameter;
 import com.moler.task.entity.Vehicle;
+import com.moler.task.exception.BadQueryParametersException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,22 +26,25 @@ public class VehicleRepositoryImpl implements VehicleRepository {
 
     @Transactional
     @Override
-    public List<Vehicle> getAllVehicles(VehicleQueryParameter parameter) {
-        Optional<Integer> offset = parameter.getOffset();
+    public List<Vehicle> getAllVehicles(VehicleQueryParameter parameter) throws BadQueryParametersException{
+        if(parameter.getOffset() == null && parameter.getPoints() == null && parameter.getText() == null){
+            throw new BadQueryParametersException("Wrong query parameters");
+        }
+        Integer offset = parameter.getOffset().orElse(5);
         Optional<String> text = parameter.getText();
         Optional<List<Long>> points = parameter.getPoints();
+
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
         Root<Vehicle> root = query.from(Vehicle.class);
-        
+
         query.select(root);
         TypedQuery<Vehicle> q = em.createQuery(query);
+
         List<Vehicle> vehicles = q.getResultList();
-
         text.ifPresent(e -> filterByTitleOrDescription(e, vehicles));
-        offset.ifPresent(e -> filterPages(e, vehicles));
+        filterPages(offset, vehicles);
         points.ifPresent(e -> filterByPoints(e, vehicles));
-
         return vehicles;
     }
 
@@ -59,6 +63,7 @@ public class VehicleRepositoryImpl implements VehicleRepository {
 
     private void filterByPoints(List<Long> points, List<Vehicle> vehicles){
         if(points.size() < 1)return;
+
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
         Root<Vehicle> vehicleRoot = query.from(Vehicle.class);
