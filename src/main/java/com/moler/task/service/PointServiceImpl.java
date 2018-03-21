@@ -1,12 +1,15 @@
 package com.moler.task.service;
 
 
+import com.moler.task.dto.PointResponse;
 import com.moler.task.entity.Point;
 import com.moler.task.repository.PointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -17,9 +20,9 @@ public class PointServiceImpl implements PointService {
 
 
     @Override
-    public List<Point> getAll() {
-
-        return null;
+    public PointResponse getAll() {
+        List<Point> points = pointRepository.getAll();
+        return new PointResponse(200, points);
     }
 
     @Override
