@@ -1,11 +1,7 @@
 package com.moler.task.repository;
 
-import com.moler.task.dto.VehicleParameter;
 import com.moler.task.dto.VehicleQueryParameter;
-import com.moler.task.dto.VehicleResponse;
-import com.moler.task.entity.Point;
 import com.moler.task.entity.Vehicle;
-import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +15,6 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 @Repository
 public class VehicleRepositoryImpl implements VehicleRepository {
@@ -30,48 +25,26 @@ public class VehicleRepositoryImpl implements VehicleRepository {
 
     @Transactional
     @Override
-    public List<Vehicle> getAllVehicles(Optional<Integer> offset, Optional<String> text, Optional<List<Integer>> points) {
+    public List<Vehicle> getAllVehicles(VehicleQueryParameter parameter) {
+        Optional<Integer> offset = parameter.getOffset();
+        Optional<String> text = parameter.getText();
+        Optional<List<Long>> points = parameter.getPoints();
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
         Root<Vehicle> root = query.from(Vehicle.class);
+        
         query.select(root);
         TypedQuery<Vehicle> q = em.createQuery(query);
         List<Vehicle> vehicles = q.getResultList();
 
         text.ifPresent(e -> filterByTitleOrDescription(e, vehicles));
-        //Przetestowac to jak bedzie inne dzialac
-        //offset.ifPresent(e -> filterPages(e, vehicles));
-        //points.ifPresent(e -> filterByPoints(e, vehicles));
-
-
+        offset.ifPresent(e -> filterPages(e, vehicles));
+        points.ifPresent(e -> filterByPoints(e, vehicles));
 
         return vehicles;
     }
 
-    @Transactional
-    @Override
-    public List<Vehicle> getAllVehicles(VehicleQueryParameter parameter) {
-        Integer offset = parameter.getOffset().orElse(1);
-        String text = parameter.getText().orElse("");
-        List<Integer> points = parameter.getPoints().orElse(null);
-
-
-
-        //List<Vehicle> filteredVehiclesByTitleOrDescription = filterByTitleOrDescription(text);
-        //return filteredVehiclesByTitleOrDescription;
-        return null;
-//        CriteriaBuilder builder = em.getCriteriaBuilder();
-//        CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
-//        Root<Vehicle> root = query.from(Vehicle.class);
-//        query.select(root);
-//        TypedQuery<Vehicle> q = em.createQuery(query);
-//        query.groupBy(root.get("id"));
-//        List<Vehicle> result =  q.getResultList();
-//        return result;
-
-    }
-
-    private List<Vehicle> filterPages(Integer offset, List<Vehicle> vehicles){
+    private void filterPages(Integer offset, List<Vehicle> vehicles){
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
         Root<Vehicle> root = query.from(Vehicle.class);
@@ -81,41 +54,31 @@ public class VehicleRepositoryImpl implements VehicleRepository {
         typedQuery.setMaxResults(offset);
 
         vehicles.clear();
-        vehicles = typedQuery.getResultList();
-
-
-        return vehicles;
+        vehicles.addAll(typedQuery.getResultList());
     }
 
-    private List<Vehicle> filterByPoints(List<Integer> points, List<Vehicle> vehicles){
+    private void filterByPoints(List<Long> points, List<Vehicle> vehicles){
+        if(points.size() < 1)return;
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
-        Root<Vehicle> root = query.from(Vehicle.class);
-        CriteriaQuery<Vehicle> select = query.select(root);
+        Root<Vehicle> vehicleRoot = query.from(Vehicle.class);
 
-
-
-        List<Predicate> conditions = new ArrayList<>();
-
-        for (Integer point : points) {
-            conditions.add(builder.equal(root.get("point_id"), point));
+        List<Vehicle> vehiclesAtSamePoint = new ArrayList<>();
+        for (Long point : points) {
+            query.where(builder.equal(vehicleRoot.get("point"),point));
+            TypedQuery<Vehicle> qs = em.createQuery(query);
+            vehiclesAtSamePoint.addAll(qs.getResultList());
         }
 
-        query.where(conditions.toArray(new Predicate[0]));
-        TypedQuery<Vehicle> q = em.createQuery(query);
-
         vehicles.clear();
-        vehicles = q.getResultList();
-
-
-        return vehicles;
+        vehicles.addAll(vehiclesAtSamePoint);
     }
 
 
 
 
 
-    private List<Vehicle> filterByTitleOrDescription(String text, List<Vehicle> vehicles) {
+    private void filterByTitleOrDescription(String text, List<Vehicle> vehicles) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
         Root<Vehicle> root = query.from(Vehicle.class);
@@ -129,42 +92,15 @@ public class VehicleRepositoryImpl implements VehicleRepository {
         TypedQuery<Vehicle> q = em.createQuery(query);
 
         vehicles.clear();
-
-        vehicles =  q.getResultList();
-        return vehicles;
+        vehicles.addAll(q.getResultList());
     }
+
+
+
 
     @Transactional
     @Override
-    public Vehicle getVehicleByTitle(String title) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
-        Root<Vehicle> root = query.from(Vehicle.class);
-        query.select(root).where(builder.equal(root.get("title"), title));
-        TypedQuery<Vehicle> q = em.createQuery(query);
-        Vehicle vehicle = q.getSingleResult();
-        return vehicle;
-    }
-
-    @Override
-    public Vehicle getVehicleByDescription(String description) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
-        Root<Vehicle> root = query.from(Vehicle.class);
-        query.select(root).where(builder.equal(root.get("description"), description));
-        TypedQuery<Vehicle> q = em.createQuery(query);
-        Vehicle vehicle = q.getSingleResult();
-        return vehicle;
-    }
-
-    @Override
-    public List<Vehicle> getAllVehicleAtPoint(Point point) {
-        return null;
-    }
-
-    @Transactional
-    @Override
-    public void save(VehicleParameter vehicle) {
+    public void save(Vehicle vehicle) {
         em.merge(vehicle);
     }
 

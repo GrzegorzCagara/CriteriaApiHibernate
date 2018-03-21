@@ -38,6 +38,11 @@ public class PointRepositoryImpl implements PointRepository{
     @Override
     @Transactional
     public Point getPointById(Long id) {
-        return null;
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Point> query = builder.createQuery(Point.class);
+        Root<Point> root = query.from(Point.class);
+        query.select(root).where(builder.equal(root.get("id"), id));
+        TypedQuery<Point> q = em.createQuery(query);
+        return q.getSingleResult();
     }
 }

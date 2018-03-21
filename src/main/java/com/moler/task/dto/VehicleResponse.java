@@ -4,9 +4,11 @@ import com.moler.task.entity.Vehicle;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 public class VehicleResponse {
     private Integer status;
-    private Vehicle data;
+    private List<Vehicle> data;
 }
