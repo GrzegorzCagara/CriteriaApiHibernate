@@ -12,17 +12,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.omg.CORBA.Any;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class VehicleServiceTest {
@@ -44,17 +40,6 @@ public class VehicleServiceTest {
     @InjectMocks
     private VehicleServiceImpl vehicleService;
 
-    @Test
-    public void testSave(){
-//        when(pointRepository.getPointById(anyInt())).thenReturn(point);
-//        when(vehicleRepository.save(vehicle)).thenReturn(vehicle);
-//
-//
-//        Vehicle result = vehicleService.save(vehicleDTO);
-//
-//        assertNotNull(result);
-//        verify(vehicleRepository, times(1)).save(vehicle);
-    }
 
     @Test
     public void testGetAll(){

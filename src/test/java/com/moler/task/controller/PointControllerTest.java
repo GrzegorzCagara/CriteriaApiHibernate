@@ -1,5 +1,6 @@
 package com.moler.task.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moler.task.dto.PointResponse;
 import com.moler.task.entity.Point;
 import com.moler.task.service.PointResponseService;
@@ -23,7 +24,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -45,22 +46,6 @@ public class PointControllerTest {
         mockPoint = new Point(1, "punkt");
     }
 
-    @Test
-    public void shouldSavePoint() throws Exception {
-//        Point point = new Point(1, "punkt");
-//        when(pointService.save(point)).thenReturn(point);
-//        String expected = "1";
-//        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
-//                "/points/save").accept(
-//                MediaType.APPLICATION_JSON);
-//
-//        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-//        MockHttpServletResponse response = result.getResponse();
-//
-//        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
-//        JSONAssert.assertEquals(expected, result.getResponse()
-//                .getContentAsString(), false);
-    }
 
     @Test
     public void getAllPoints() throws Exception {
@@ -87,4 +72,5 @@ public class PointControllerTest {
         List<Point> points = Arrays.asList(point, point2, point3);
         return points;
     }
+
 }

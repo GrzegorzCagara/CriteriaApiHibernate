@@ -1,17 +1,14 @@
 package com.moler.task.repository;
 
 import com.moler.task.dto.VehicleQueryParameter;
+import com.moler.task.entity.Point;
 import com.moler.task.entity.Vehicle;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,94 +16,43 @@ import java.util.Optional;
 @Repository
 public class VehicleRepositoryImpl implements VehicleRepository {
 
-    @PersistenceContext
-    private EntityManager em;
-
+    private static final int RESULTS_ON_PAGE = 5;
+    @PersistenceContext private EntityManager em;
 
     @Transactional
     @Override
     public List<Vehicle> getAll(VehicleQueryParameter parameter) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
-        Root<Vehicle> root = query.from(Vehicle.class);
-        query.select(root);
-        TypedQuery<Vehicle> q = em.createQuery(query);
-        List<Vehicle> vehicles = q.getResultList();
-
-        if(parameter.getOffset() == null && parameter.getPoints() == null && parameter.getText() == null){
-            filterPages(5, vehicles);
-            return vehicles;
-        }
-        Integer offset = parameter.getOffset().orElse(5);
-        Optional<String> text = parameter.getText();
+        int offset = parameter.getOffset().orElse(0);
         Optional<List<Integer>> points = parameter.getPoints();
+        Optional<String> text = parameter.getText();
 
-        text.ifPresent(e -> filterByTitleOrDescription(e, vehicles));
-        filterPages(offset, vehicles);
-        points.ifPresent(e -> filterByPoints(e, vehicles));
-        return vehicles;
-    }
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Vehicle> q = cb.createQuery(Vehicle.class);
+        Root<Vehicle> vehicle = q.from(Vehicle.class);
+        List<Predicate> predicates = new ArrayList<>();
 
-    private void filterPages(Integer offset, List<Vehicle> vehicles){
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
-        Root<Vehicle> root = query.from(Vehicle.class);
-        CriteriaQuery<Vehicle> select = query.select(root);
-        TypedQuery<Vehicle> typedQuery = em.createQuery(select);
-        typedQuery.setFirstResult(0);
-        typedQuery.setMaxResults(offset);
-
-        vehicles.clear();
-        vehicles.addAll(typedQuery.getResultList());
-    }
-
-    private void filterByPoints(List<Integer> points, List<Vehicle> vehicles){
-        if(points.size() < 1)return;
-
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
-        Root<Vehicle> vehicleRoot = query.from(Vehicle.class);
-
-        List<Vehicle> vehiclesAtSamePoint = new ArrayList<>();
-        for (Integer point : points) {
-            query.where(builder.equal(vehicleRoot.get("point"),point));
-            TypedQuery<Vehicle> qs = em.createQuery(query);
-            vehiclesAtSamePoint.addAll(qs.getResultList());
+        if (text.isPresent()) {
+            Predicate titleLike = cb.like(cb.upper(vehicle.get("title")), "%" + text.get().toUpperCase() + "%");
+            Predicate descriptionLike = cb.like(cb.upper(vehicle.get("description")), "%" + text.get().toUpperCase() + "%");
+            predicates.add(cb.or(titleLike, descriptionLike));
         }
 
-        vehicles.clear();
-        vehicles.addAll(vehiclesAtSamePoint);
+        if (points.isPresent() && !points.get().isEmpty()) {
+            Join<Vehicle, Point> point = vehicle.join("point");
+            Predicate pointIdIn = point.get("id").in(points.get());
+            predicates.add(pointIdIn);
+        }
+
+        q.select(vehicle);
+        q.where(predicates.toArray(new Predicate[predicates.size()]));
+        return em.createQuery(q).setMaxResults(RESULTS_ON_PAGE).setFirstResult(offset).getResultList();
     }
-
-
-
-
-
-    private void filterByTitleOrDescription(String text, List<Vehicle> vehicles) {
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
-        Root<Vehicle> root = query.from(Vehicle.class);
-        query.select(root);
-
-        Predicate likeTitle = builder.like(builder.upper(root.get("title")), "%" + text.toUpperCase() + "%");
-        Predicate likeDescription = builder.like(builder.upper(root.get("description")), "%" + text.toUpperCase() + "%");
-        Predicate isTextInTitleOrDescription = builder.or(likeTitle, likeDescription);
-
-        query.where(isTextInTitleOrDescription);
-        TypedQuery<Vehicle> q = em.createQuery(query);
-
-        vehicles.clear();
-        vehicles.addAll(q.getResultList());
-    }
-
-
 
 
     @Transactional
     @Override
     public Vehicle save(Vehicle vehicle) {
-         return em.merge(vehicle);
+        return em.merge(vehicle);
     }
-
-
 }
+

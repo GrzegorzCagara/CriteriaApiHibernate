@@ -6,7 +6,6 @@ import com.moler.task.dto.VehicleResponse;
 import com.moler.task.entity.Vehicle;
 import com.moler.task.service.VehicleResponseService;
 import com.moler.task.service.VehicleService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/vehicles")
-
 public class VehicleController {
 
     private final VehicleService vehicleService;
