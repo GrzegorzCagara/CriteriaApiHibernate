@@ -17,13 +17,13 @@ public class PointServiceImpl implements PointService {
     private final PointRepository pointRepository;
 
     @Override
-    public PointResponse getAll() {
+    public List<Point> getAll() {
         List<Point> points = pointRepository.getAll();
-        return new PointResponse(200, points);
+        return points;
     }
 
     @Override
-    public void save(Point point) {
-        pointRepository.save(point);
+    public Point save(Point point) {
+        return pointRepository.save(point);
     }
 }

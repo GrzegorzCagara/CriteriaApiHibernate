@@ -1,10 +1,13 @@
 package com.moler.task.service;
 
-import com.moler.task.dto.VehicleParameter;
+import com.moler.task.dto.VehicleDTO;
 import com.moler.task.dto.VehicleQueryParameter;
 import com.moler.task.dto.VehicleResponse;
+import com.moler.task.entity.Vehicle;
+
+import java.util.List;
 
 public interface VehicleService {
-    VehicleResponse getAllVehicles(VehicleQueryParameter parameter);
-    void save(VehicleParameter vehicleParameter);
+    List<Vehicle> getAll(VehicleQueryParameter parameter);
+    Vehicle save(VehicleDTO vehicleDTO);
 }

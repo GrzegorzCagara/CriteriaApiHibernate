@@ -8,11 +8,11 @@ import lombok.ToString;
 @Getter
 @AllArgsConstructor
 @ToString
-public class VehicleParameter {
+public class VehicleDTO {
     private Long id;
     private String title;
     private String description;
     private Long point;
 
-    public VehicleParameter(){}
+    public VehicleDTO(){}
 }

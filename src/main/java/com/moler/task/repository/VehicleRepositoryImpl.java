@@ -26,22 +26,22 @@ public class VehicleRepositoryImpl implements VehicleRepository {
 
     @Transactional
     @Override
-    public List<Vehicle> getAllVehicles(VehicleQueryParameter parameter) throws BadQueryParametersException{
+    public List<Vehicle> getAll(VehicleQueryParameter parameter) {
+        CriteriaBuilder builder = em.getCriteriaBuilder();
+        CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
+        Root<Vehicle> root = query.from(Vehicle.class);
+        query.select(root);
+        TypedQuery<Vehicle> q = em.createQuery(query);
+        List<Vehicle> vehicles = q.getResultList();
+
         if(parameter.getOffset() == null && parameter.getPoints() == null && parameter.getText() == null){
-            throw new BadQueryParametersException("Wrong query parameters");
+            filterPages(5, vehicles);
+            return vehicles;
         }
         Integer offset = parameter.getOffset().orElse(5);
         Optional<String> text = parameter.getText();
         Optional<List<Long>> points = parameter.getPoints();
 
-        CriteriaBuilder builder = em.getCriteriaBuilder();
-        CriteriaQuery<Vehicle> query = builder.createQuery(Vehicle.class);
-        Root<Vehicle> root = query.from(Vehicle.class);
-
-        query.select(root);
-        TypedQuery<Vehicle> q = em.createQuery(query);
-
-        List<Vehicle> vehicles = q.getResultList();
         text.ifPresent(e -> filterByTitleOrDescription(e, vehicles));
         filterPages(offset, vehicles);
         points.ifPresent(e -> filterByPoints(e, vehicles));
@@ -105,8 +105,8 @@ public class VehicleRepositoryImpl implements VehicleRepository {
 
     @Transactional
     @Override
-    public void save(Vehicle vehicle) {
-        em.merge(vehicle);
+    public Vehicle save(Vehicle vehicle) {
+         return em.merge(vehicle);
     }
 
 

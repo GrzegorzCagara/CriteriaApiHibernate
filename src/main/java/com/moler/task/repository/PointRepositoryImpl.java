@@ -31,8 +31,9 @@ public class PointRepositoryImpl implements PointRepository{
 
     @Override
     @Transactional
-    public void save(Point point) {
-        em.merge(point);
+    public Point save(Point point) {
+
+        return em.merge(point);
     }
 
     @Override

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface PointRepository {
     List<Point> getAll();
-    void save(Point point);
+    Point save(Point point);
     Point getPointById(Long id);
 
 }

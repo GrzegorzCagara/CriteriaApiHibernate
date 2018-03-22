@@ -1,6 +1,6 @@
 package com.moler.task.service;
 
-import com.moler.task.dto.VehicleParameter;
+import com.moler.task.dto.VehicleDTO;
 import com.moler.task.dto.VehicleQueryParameter;
 import com.moler.task.dto.VehicleResponse;
 import com.moler.task.entity.Point;
@@ -20,20 +20,16 @@ public class VehicleServiceImpl implements VehicleService{
     private final VehicleRepository vehicleRepository;
     private final PointRepository pointRepository;
 
-
     @Override
-    public VehicleResponse getAllVehicles(VehicleQueryParameter parameter) {
-        List<Vehicle> vehicles = vehicleRepository.getAllVehicles(parameter);
-        return new VehicleResponse(200, vehicles);
+    public List<Vehicle> getAll(VehicleQueryParameter parameter) {
+        return vehicleRepository.getAll(parameter);
     }
 
-
-
     @Override
-    public void save(VehicleParameter vehicleParameter) {
-        Point point = pointRepository.getPointById(vehicleParameter.getPoint());
-        Vehicle vehicle = new Vehicle(vehicleParameter.getId(), vehicleParameter.getTitle(), vehicleParameter.getDescription(), point);
-        vehicleRepository.save(vehicle);
+    public Vehicle save(VehicleDTO vehicleDTO) {
+        Point point = pointRepository.getPointById(vehicleDTO.getPoint());
+        Vehicle vehicle = new Vehicle(vehicleDTO.getId(), vehicleDTO.getTitle(), vehicleDTO.getDescription(), point);
+        return vehicleRepository.save(vehicle);
     }
 
 }
