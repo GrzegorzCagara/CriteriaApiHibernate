@@ -14,7 +14,7 @@ import javax.persistence.ManyToOne;
 @ToString
 public class Vehicle {
     @Id
-    private Long id;
+    private Integer id;
     private String title;
     private String description;
     @ManyToOne
@@ -22,7 +22,7 @@ public class Vehicle {
 
     public Vehicle(){}
 
-    public Vehicle(Long id, String title, String description, Point point) {
+    public Vehicle(Integer id, String title, String description, Point point) {
         this.id = id;
         this.title = title;
         this.description = description;

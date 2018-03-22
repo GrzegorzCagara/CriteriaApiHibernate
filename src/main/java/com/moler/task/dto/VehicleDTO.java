@@ -9,10 +9,10 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class VehicleDTO {
-    private Long id;
+    private Integer id;
     private String title;
     private String description;
-    private Long point;
+    private Integer point;
 
     public VehicleDTO(){}
 }

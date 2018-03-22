@@ -31,7 +31,7 @@ public class VehicleController {
 
 
     @PostMapping("/save")
-    public ResponseEntity<Long> save(@RequestBody VehicleDTO vehicle){
+    public ResponseEntity<Integer> save(@RequestBody VehicleDTO vehicle){
         Vehicle result = vehicleService.save(vehicle);
         return new ResponseEntity<>(result.getId(), HttpStatus.CREATED);
     }

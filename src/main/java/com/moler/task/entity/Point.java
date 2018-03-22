@@ -13,12 +13,12 @@ import javax.persistence.Id;
 @ToString
 public class Point {
     @Id
-    private Long id;
+    private Integer id;
     private String name;
 
     public Point() {}
 
-    public Point(Long id, String name) {
+    public Point(Integer id, String name) {
         this.id = id;
         this.name = name;
     }

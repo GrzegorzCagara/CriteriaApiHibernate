@@ -32,13 +32,12 @@ public class PointRepositoryImpl implements PointRepository{
     @Override
     @Transactional
     public Point save(Point point) {
-
         return em.merge(point);
     }
 
     @Override
     @Transactional
-    public Point getPointById(Long id) {
+    public Point getPointById(Integer id) {
         CriteriaBuilder builder = em.getCriteriaBuilder();
         CriteriaQuery<Point> query = builder.createQuery(Point.class);
         Root<Point> root = query.from(Point.class);

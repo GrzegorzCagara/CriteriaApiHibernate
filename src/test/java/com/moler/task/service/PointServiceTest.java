@@ -21,13 +21,10 @@ public class PointServiceTest {
 
     @Mock
     private PointResponse pointResponse;
-
     @Mock
     private Point point;
-
     @Mock
     private PointRepository pointRepository;
-
     @InjectMocks
     private PointServiceImpl pointService;
 
@@ -41,20 +38,20 @@ public class PointServiceTest {
         verify(pointRepository, times(1)).save(point);
     }
 
-//    @Test
-//    public void testGetAll(){
-//        List<Point> points = new ArrayList<>();
-//        points.add(mock(Point.class));
-//        points.add(mock(Point.class));
-//        points.add(mock(Point.class));
-//        points.add(mock(Point.class));
-//        when(pointRepository.getAll()).thenReturn(points);
-//
-//        PointResponse result = pointService.getAll();
-//        int pointsSize = points.size();
-//
-//        assertNotNull(result);
-//        assertEquals(result.getData().size(), pointsSize);
-//        verify(pointRepository, times(1)).getAll();
-//    }
+    @Test
+    public void testGetAll(){
+        List<Point> points = new ArrayList<>();
+        points.add(mock(Point.class));
+        points.add(mock(Point.class));
+        points.add(mock(Point.class));
+        points.add(mock(Point.class));
+        when(pointRepository.getAll()).thenReturn(points);
+
+        List<Point> result = pointService.getAll();
+        int pointsSize = points.size();
+
+        assertNotNull(result);
+        assertEquals(result.size(), pointsSize);
+        verify(pointRepository, times(1)).getAll();
+    }
 }

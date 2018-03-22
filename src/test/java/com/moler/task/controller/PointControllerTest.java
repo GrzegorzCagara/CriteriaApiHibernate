@@ -2,6 +2,7 @@ package com.moler.task.controller;
 
 import com.moler.task.dto.PointResponse;
 import com.moler.task.entity.Point;
+import com.moler.task.service.PointResponseService;
 import com.moler.task.service.PointService;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,12 +35,14 @@ public class PointControllerTest {
 
     @MockBean
     private PointService pointService;
+    @MockBean
+    private PointResponseService pointResponseService;
 
     private Point mockPoint = null;
 
     @Before
     public void setUp() throws Exception{
-        mockPoint = new Point(1L, "punkt");
+        mockPoint = new Point(1, "punkt");
     }
 
     @Test
@@ -49,32 +52,27 @@ public class PointControllerTest {
 
     @Test
     public void getAllPoints() throws Exception {
-//        PointResponse mockPoints = mockItems();
-//
-//        when(pointService.getAll()).thenReturn(mockPoints);
-//        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
-//                "/points/get").accept(
-//                MediaType.APPLICATION_JSON);
-//        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
-//
-//        String expected = "{status:200, data: [{id: 1, name: punkt}, {id: 2, name: punkt2}, {id: 3, name: punkt3} ] }";
-//
-//        MockHttpServletResponse response = result.getResponse();
-//
-//        assertEquals(HttpStatus.OK.value(), response.getStatus());
-//
-//        JSONAssert.assertEquals(expected, result.getResponse()
-//                .getContentAsString(), false);
+        List<Point> mockPoints = mockPoints();
+        PointResponse pointResponse = new PointResponse(200, mockPoints);
+        when(pointResponseService.getPointResponse()).thenReturn(pointResponse);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
+                "/points/get").accept(
+                MediaType.APPLICATION_JSON);
+        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+
+        String expected = "{status:200, data: [{id: 1, name: punkt}, {id: 2, name: punkt2}, {id: 3, name: punkt3} ] }";
+        MockHttpServletResponse response = result.getResponse();
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        JSONAssert.assertEquals(expected, result.getResponse()
+                .getContentAsString(), false);
     }
 
-    private PointResponse mockItems(){
-        Point point = new Point(1L, "punkt");
-        Point point2 = new Point(2L, "punkt2");
-        Point point3 = new Point(3L, "punkt3");
+    private List<Point> mockPoints(){
+        Point point = new Point(1, "punkt");
+        Point point2 = new Point(2, "punkt2");
+        Point point3 = new Point(3, "punkt3");
         List<Point> points = Arrays.asList(point, point2, point3);
-//        PointResponse p = new PointResponse(200, point);
-//        PointResponse p2 = new PointResponse(200, point2);
-//        PointResponse p3 = new PointResponse(200, point3);
-        return new PointResponse(200, points);
+        return points;
     }
 }

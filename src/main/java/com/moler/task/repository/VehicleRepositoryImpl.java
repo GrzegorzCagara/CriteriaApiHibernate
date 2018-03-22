@@ -2,7 +2,6 @@ package com.moler.task.repository;
 
 import com.moler.task.dto.VehicleQueryParameter;
 import com.moler.task.entity.Vehicle;
-import com.moler.task.exception.BadQueryParametersException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +39,7 @@ public class VehicleRepositoryImpl implements VehicleRepository {
         }
         Integer offset = parameter.getOffset().orElse(5);
         Optional<String> text = parameter.getText();
-        Optional<List<Long>> points = parameter.getPoints();
+        Optional<List<Integer>> points = parameter.getPoints();
 
         text.ifPresent(e -> filterByTitleOrDescription(e, vehicles));
         filterPages(offset, vehicles);
@@ -61,7 +60,7 @@ public class VehicleRepositoryImpl implements VehicleRepository {
         vehicles.addAll(typedQuery.getResultList());
     }
 
-    private void filterByPoints(List<Long> points, List<Vehicle> vehicles){
+    private void filterByPoints(List<Integer> points, List<Vehicle> vehicles){
         if(points.size() < 1)return;
 
         CriteriaBuilder builder = em.getCriteriaBuilder();
@@ -69,7 +68,7 @@ public class VehicleRepositoryImpl implements VehicleRepository {
         Root<Vehicle> vehicleRoot = query.from(Vehicle.class);
 
         List<Vehicle> vehiclesAtSamePoint = new ArrayList<>();
-        for (Long point : points) {
+        for (Integer point : points) {
             query.where(builder.equal(vehicleRoot.get("point"),point));
             TypedQuery<Vehicle> qs = em.createQuery(query);
             vehiclesAtSamePoint.addAll(qs.getResultList());

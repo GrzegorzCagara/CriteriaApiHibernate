@@ -13,7 +13,7 @@ import java.util.Optional;
 public class VehicleQueryParameter {
     private Optional<Integer> offset;
     private Optional<String> text;
-    private Optional<List<Long>> points;
+    private Optional<List<Integer>> points;
 
     public VehicleQueryParameter(){}
 }

@@ -23,7 +23,7 @@ public class PointController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Long> save(@RequestBody Point point){
+    public ResponseEntity<Integer> save(@RequestBody Point point){
         Point result = pointService.save(point);
         return new ResponseEntity<>(result.getId(), HttpStatus.CREATED);
     }
