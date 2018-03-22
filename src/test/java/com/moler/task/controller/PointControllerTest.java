@@ -46,8 +46,20 @@ public class PointControllerTest {
     }
 
     @Test
-    public void shouldReturnStatus200WhenPointSaved() {
-
+    public void shouldSavePoint() throws Exception {
+//        Point point = new Point(1, "punkt");
+//        when(pointService.save(point)).thenReturn(point);
+//        String expected = "1";
+//        RequestBuilder requestBuilder = MockMvcRequestBuilders.post(
+//                "/points/save").accept(
+//                MediaType.APPLICATION_JSON);
+//
+//        MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+//        MockHttpServletResponse response = result.getResponse();
+//
+//        assertEquals(HttpStatus.CREATED.value(), response.getStatus());
+//        JSONAssert.assertEquals(expected, result.getResponse()
+//                .getContentAsString(), false);
     }
 
     @Test
